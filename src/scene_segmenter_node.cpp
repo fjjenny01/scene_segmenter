@@ -5,6 +5,8 @@
 #include <boost/shared_ptr.hpp>
 #include <pcl_ros/point_cloud.h>
 
+#include <pcl/visualization/cloud_viewer.h>
+
 #include "std_msgs/String.h"
 #include "sensor_msgs/PointCloud2.h"
 #include "perception_msgs/SegmentedObject.h"
@@ -52,9 +54,32 @@ namespace scene_segmenter_node
         std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> cloudClusters = clusterExtractor.getCloudClusters();
 
 
+        pcl::visualization::CloudViewer viewer("Cloud Viewer");
+
+         //blocks until the cloud is actually rendered
+         pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_for_viewer (new pcl::PointCloud<pcl::PointXYZ>());
+         //pcl::fromPCLPointCloud2(*cloud, *cloud_for_viewer);
+
+         //pcl::fromPCLPointCloud2(*cloudClusters.at(0), *cloud_for_viewer);
+         //viewer.showCloud(cloud_for_viewer);
+         viewer.showCloud(cloudClusters.at(0));
+
+         //use the following functions to get access to the underlying more advanced/powerful
+         //PCLVisualizer
+
+
+
+         while (!viewer.wasStopped ())
+         {
+         //you can also do cool processing here
+         //FIXME: Note that this is running in a separate thread from viewerPsycho
+         //and you should guard against race conditions yourself...
+
+         }
+
         //for (std::vector<int>::const_iterator pit = it->indices.begin (); pit != it->indices.end (); pit++)
         //{
-         //   cloud_cluster->points.push_back (cloud_filtered->points[*pit]); //*
+        //    cloud_cluster->points.push_back (cloud_filtered->points[*pit]); //*
         //}
             
 
@@ -77,7 +102,7 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "scene_segmenter_node");
   ros::NodeHandle nh;
 
- // scene_segmenter_node::SceneSegmenterNode node;
+  scene_segmenter_node::SceneSegmenterNode node;
 
   ros::spin();
   return 0;
