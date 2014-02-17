@@ -36,61 +36,43 @@ namespace scene_segmenter_node
 
     SceneSegmenterNode::SceneSegmenterNode(): node_handle("")
     {
-
-        pointCloudSubscriber = node_handle.subscribe("point_cloud", 1000, &SceneSegmenterNode::pointCloudMessageCallback, this);
+        pointCloudSubscriber = node_handle.subscribe("scene", 1000, &SceneSegmenterNode::pointCloudMessageCallback, this);
 
         segmentedObjectsPublisher = node_handle.advertise<perception_msgs::SegmentedObjectList>("segmented_objects",10);
 
         ROS_INFO("scene_segmenter_node ready");
-
-        //demo
-        pcl::PCLPointCloud2::Ptr cloud (new pcl::PCLPointCloud2 ());
-        pcl::PCDReader reader;
-        std::string fileName = ros::package::getPath("object_models") + "/models/pcl_example_scenes/table_scene_lms400.pcd";
-        reader.read (fileName, *cloud); 
-        ClusterExtractor clusterExtractor = ClusterExtractor();
-        clusterExtractor.setCloud(cloud);
-        clusterExtractor.computeClusters();
-        std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> cloudClusters = clusterExtractor.getCloudClusters();
-
-
-        pcl::visualization::CloudViewer viewer("Cloud Viewer");
-
-         //blocks until the cloud is actually rendered
-         pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_for_viewer (new pcl::PointCloud<pcl::PointXYZ>());
-         //pcl::fromPCLPointCloud2(*cloud, *cloud_for_viewer);
-
-         //pcl::fromPCLPointCloud2(*cloudClusters.at(0), *cloud_for_viewer);
-         //viewer.showCloud(cloud_for_viewer);
-         viewer.showCloud(cloudClusters.at(0));
-
-         //use the following functions to get access to the underlying more advanced/powerful
-         //PCLVisualizer
-
-
-
-         while (!viewer.wasStopped ())
-         {
-         //you can also do cool processing here
-         //FIXME: Note that this is running in a separate thread from viewerPsycho
-         //and you should guard against race conditions yourself...
-
-         }
-
-        //for (std::vector<int>::const_iterator pit = it->indices.begin (); pit != it->indices.end (); pit++)
-        //{
-        //    cloud_cluster->points.push_back (cloud_filtered->points[*pit]); //*
-        //}
-            
-
-
-        //segmentedObjectsPublisher.publish(segmentedObjects);
     }
 
 
     void SceneSegmenterNode::pointCloudMessageCallback(const sensor_msgs::PointCloud2::ConstPtr &msg)
     {
         ROS_INFO("Received point cloud to process");
+
+        //convert cloud to pcl cloud2
+        pcl::PCLPointCloud2::Ptr cloud (new pcl::PCLPointCloud2());
+        pcl_conversions::toPCL(*msg, *cloud);
+
+        //extract clusters
+        ClusterExtractor clusterExtractor = ClusterExtractor();
+        clusterExtractor.setCloud(cloud);
+        clusterExtractor.computeClusters();
+        std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> cloudClusters = clusterExtractor.getCloudClusters();
+
+        //publish clusters
+        perception_msgs::SegmentedObjectList segmentedObjectsList;
+        for(int i = 0; i<cloudClusters.size();i++)
+        {
+            //convert segmented object point cloud to sensor_msgs point cloud
+            sensor_msgs::PointCloud2 sensorMessagePointCloud;
+            pcl::toROSMsg(*cloudClusters.at(i),sensorMessagePointCloud);
+
+            perception_msgs::SegmentedObject segmentedObject;
+            segmentedObject.segmentedObjectID = i;
+            segmentedObject.segmentedObjectPointCloud = sensorMessagePointCloud;
+            segmentedObjectsList.segmentedObjects.push_back(segmentedObject);
+        }
+
+        segmentedObjectsPublisher.publish(segmentedObjectsList);
     }
 }
 

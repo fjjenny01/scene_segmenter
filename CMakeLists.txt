@@ -98,14 +98,14 @@ link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
 
 ## Declare a cpp library
-# add_library(scene_segmenter
-#   src/${PROJECT_NAME}/scene_segmenter.cpp
-# )
-
-
+add_library(scene_segmenter
+   src/cluster_extraction/cluster_extractor.cpp
+ )
 
 ## Declare a cpp executable
-add_executable(scene_segmenter_node src/scene_segmenter_node.cpp src/cluster_extraction/cluster_extractor.cpp)
+add_executable(scene_segmenter_node src/scene_segmenter_node.cpp)
+
+add_executable(test_scene_segmenter_node test/test_scene_segmenter_node.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
@@ -114,8 +114,16 @@ add_dependencies(scene_segmenter_node perception_msgs_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
  target_link_libraries(scene_segmenter_node
-   ${catkin_LIBRARIES} 
-   ${PCL_LIBRARIES}
+ 	scene_segmenter
+   	${catkin_LIBRARIES} 
+   	${PCL_LIBRARIES}
+ )
+
+ target_link_libraries(test_scene_segmenter_node
+ 	scene_segmenter
+   	${catkin_LIBRARIES} 
+   	${PCL_LIBRARIES}
+   	gtest
  )
 
 #############
