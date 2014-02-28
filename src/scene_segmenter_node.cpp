@@ -36,7 +36,7 @@ namespace scene_segmenter_node
 
     SceneSegmenterNode::SceneSegmenterNode(): node_handle("")
     {
-        pointCloudSubscriber = node_handle.subscribe("scene", 1000, &SceneSegmenterNode::pointCloudMessageCallback, this);
+        pointCloudSubscriber = node_handle.subscribe("/camera/depth/points/", 1000, &SceneSegmenterNode::pointCloudMessageCallback, this);
 
         segmentedObjectsPublisher = node_handle.advertise<perception_msgs::SegmentedObjectList>("segmented_objects",10);
 
@@ -69,6 +69,7 @@ namespace scene_segmenter_node
             perception_msgs::SegmentedObject segmentedObject;
             segmentedObject.segmentedObjectID = i;
             segmentedObject.segmentedObjectPointCloud = sensorMessagePointCloud;
+            segmentedObject.segmentedObjectPointCloud.header.frame_id = msg.get()->header.frame_id;
             segmentedObjectsList.segmentedObjects.push_back(segmentedObject);
         }
 
