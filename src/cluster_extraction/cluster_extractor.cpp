@@ -56,6 +56,9 @@ void ClusterExtractor::computeClusters()
     extract.setNegative (true);
     extract.filter (*cloud_f);
     *cloud_filtered = *cloud_f;
+
+    // Add euclidean plane to computer clusters
+    cloudClusters.push_back(cloud_plane);
   }
 
   // Creating the KdTree object for the search method of the extraction
@@ -82,5 +85,4 @@ void ClusterExtractor::computeClusters()
 
     cloudClusters.push_back(cloud_cluster);
   }
-
 }
