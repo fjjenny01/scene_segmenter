@@ -36,7 +36,7 @@ namespace scene_segmenter_node
 
     SceneSegmenterNode::SceneSegmenterNode(): node_handle("")
     {
-        pointCloudSubscriber = node_handle.subscribe("/camera/depth/points/", 100, &SceneSegmenterNode::pointCloudMessageCallback, this);
+        pointCloudSubscriber = node_handle.subscribe("/camera/depth/points/", 10, &SceneSegmenterNode::pointCloudMessageCallback, this);
 
         segmentedObjectsPublisher = node_handle.advertise<perception_msgs::SegmentedObjectList>("segmented_objects",10);
 
