@@ -53,10 +53,11 @@ namespace scene_segmenter_node
         pcl_conversions::toPCL(*msg, *cloud);
 
         //extract clusters
-        ClusterExtractor clusterExtractor = ClusterExtractor();
-        clusterExtractor.setCloud(cloud);
-        clusterExtractor.computeClusters();
-        std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> cloudClusters = clusterExtractor.getCloudClusters();
+        ClusterExtractor *clusterExtractor = new ClusterExtractor();
+        clusterExtractor->setCloud(cloud);
+        clusterExtractor->computeClusters();
+        std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> cloudClusters = clusterExtractor->getCloudClusters();
+        delete clusterExtractor;
 
         //publish clusters
         perception_msgs::SegmentedObjectList segmentedObjectsList;
