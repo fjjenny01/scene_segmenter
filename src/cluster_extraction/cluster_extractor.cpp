@@ -30,7 +30,7 @@ void ClusterExtractor::computeClusters()
     seg.setDistanceThreshold (0.02);
 
     int i=0, nr_points = (int) cloud_filtered->points.size ();
-    while (cloud_filtered->points.size () > 0.85 * nr_points)
+    while (true)
     {
         pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_plane (new pcl::PointCloud<pcl::PointXYZ> ());
         // Segment the largest planar component from the remaining cloud
@@ -53,6 +53,10 @@ void ClusterExtractor::computeClusters()
         extract.filter (*cloud_plane);
         ROS_INFO("%d",++i);
         std::cout << "PointCloud representing the planar component: " << cloud_plane->points.size () << " data points." << std::endl;
+
+        if (cloud_plane->points.size() < .2*nr_points) {
+            break;
+        }
 
         // Remove the planar inliers, extract the rest
         extract.setNegative (true);
