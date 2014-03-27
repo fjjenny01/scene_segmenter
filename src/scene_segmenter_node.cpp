@@ -46,8 +46,6 @@ namespace scene_segmenter_node
 
     void SceneSegmenterNode::pointCloudMessageCallback(const sensor_msgs::PointCloud2::ConstPtr &msg)
     {
-        ROS_INFO("Received point cloud to process");
-
         //convert cloud to pcl cloud2
         pcl::PCLPointCloud2::Ptr cloud (new pcl::PCLPointCloud2());
         pcl_conversions::toPCL(*msg, *cloud);
