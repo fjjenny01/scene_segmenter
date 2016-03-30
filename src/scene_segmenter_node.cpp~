@@ -5,8 +5,10 @@
 #include <boost/shared_ptr.hpp>
 #include <pcl_ros/point_cloud.h>
 
+
 #include "std_msgs/String.h"
 #include "sensor_msgs/PointCloud2.h"
+
 #include "cluster_extractor.h"
 #include "bci_processing/BCITrialRequest.h"
 #include "bci_processing/BCITrialResult.h"
